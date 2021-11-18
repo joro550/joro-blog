@@ -16,14 +16,12 @@ jobs:
       run: dotnet build --configuration Release 
     
     - name: Publish Blazor webassembly using dotnet 
-      #create Blazor WebAssembly dist output folder in the project directory
       run: dotnet publish -c Release --no-build -o publishoutput # Don't build again, just publish
     
     - name: Publish generated Blazor webassembly to Netlify
-      uses: jsmrcaga/action-netlify-deploy@master
+      uses: netlify/actions/cli@master #uses Netlify Cli actions
       with:
+          args: deploy --dir=publishoutput/wwwroot --prod #push this folder to Netlify
+      env: 
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        NETLIFY_DEPLOY_MESSAGE: "Prod deploy v${{ github.ref }}"
-        NETLIFY_DEPLOY_TO_PROD: true
- 
