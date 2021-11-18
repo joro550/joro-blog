@@ -4,6 +4,7 @@ on: [push] # Action on which the workflow runs. Can be push, pull_request, page_
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: Blog
     steps:
     - uses: actions/checkout@master # Checkout the master branch
     
