@@ -1,0 +1,36 @@
+﻿<div class="card text-center">
+  <div class="card-header">
+    @Title
+  </div>
+  <div class="card-body">
+    @* <h5 class="card-title">@Title</h5> *@
+    <p class="card-text">
+      @SampleContent 
+      @if (Sample)
+      {
+        @: ....
+      }
+      @if(!Sample)
+      {
+        @FullContent
+      }
+    </p>
+    
+    @if (Sample)
+    {
+      <a href="@Href" class="btn btn-primary">Read full</a>
+    }
+    
+  </div>
+</div>
+
+
+
+@code {
+  [Parameter] public string Title { get; set; }
+  [Parameter] public string Href { get; set; }
+  [Parameter] public bool Sample { get; set; }
+  
+  [Parameter] public RenderFragment FullContent { get; set; }
+  [Parameter] public RenderFragment SampleContent { get; set; }
+}
