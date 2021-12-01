@@ -117,6 +117,44 @@
             is larger than the previous value and then create an array, then we  just inspect the length of the array and
             we should get the correct value
         </p>
+        
+        <pre>
+            <code>
+                let increaseCalculator (contents: string)=
+                    contents.Split(Environment.NewLine)
+                        |> Seq.map (fun x -> x |> Int32.Parse)
+                        |> Seq.pairwise
+                        |> Seq.filter (fun (x,y) -> y > x)
+                        |> Seq.length
+            </code>
+        </pre>
+        
+        <pre>
+            <code>
+                let getSlidingSum (lines : seq&lt;int>) : seq&lt;int> =
+                    let linesList = lines |> Seq.toList
+                    lines |> Seq.mapi (fun i _ -> linesList[i..i+2] |> List.sum)      
+                           
+                let windowIncreaseCalculator (contents: string)=
+                    contents.Split(Environment.NewLine)
+                        |> Seq.map (fun x -> x |> Int32.Parse)
+                        |> getSlidingSum
+                        |> Seq.pairwise
+                        |> Seq.filter (fun (x,y) -> y > x)
+                        |> Seq.length
+            </code>
+        </pre>
+        
+        <p>
+            This is what I came up with for day 1 after a lot of googling and a lot of refactoring,
+            I'm pretty happy with this for now, it looks really nice and everything is basically done
+            in a way where the result is piped into the next method, so pretty functional apart from
+            that one getSlidingSum, but for now I'm happy.
+        </p>
+        
+        <p>
+            This was a nice warm up puzzle for the coming days I think
+        </p>
     </FullContent>
 </Article>
 
