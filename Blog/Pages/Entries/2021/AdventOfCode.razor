@@ -1,8 +1,122 @@
 ﻿@page "/AoC2021"
 <Article Title="2021 - Thoughts on Advent of code" Href="AoC2021" Sample="@Sample">
     <SampleContent>
+        <p>It's that time of year again, the season of <a href="https://www.nationalgeographic.com/culture/article/advent-is-a-season-of-candlelight-reflection-and-expectation">advent</a> 
+        every year there are some new programming puzzles published by <a href="http://was.tl/">Eric Wastl</a></p> 
+        
+        <p>
+            This year I'm gonna try and keep a blog of thoughts and solutions, I've just completed the first day and
+            I've completed it with f# - now I've never really looked into f#, I've always liked the idea of functional programming languages
+            but have never dived in, so should be interesting and full of weird mistakes  
+        </p>
     </SampleContent>
     <FullContent>
+        
+        <h2>Day 1: Sonar Sweep</h2>
+        
+        <p>
+            Starting off with a bit of a simple puzzle this year (in my case), we just have to count how many times the
+            number (in the list) has increased
+        </p>
+        
+        <pre>
+            <code>
+                let increaseCalculator (contents: string)=
+                    let lines = contents.Split(Environment.NewLine) |&gt; Array.toList
+                    let intValues = lines |> List.map (fun x -&gt; x |&gt; Int32.Parse)
+                    
+                    let mutable count = 0;
+                    let mutable currentLine = lines[0] |> int;
+                    for line in intValues[1..] do
+                        if line > currentLine then count &lt;- count + 1
+                        currentLine &lt;- line
+                        
+                    count
+            </code>
+        </pre>
+        
+        <p>
+            This was my solution, it didn't originally look like this, but after some refactoring I managed to get it down
+            to this and it felt pretty good. <br/><br/>
+            
+            all though I have to admit that ugly loop in the middle there feels like a mistake, maybe there's a neater solution there
+        </p>
+        
+        <h3>Part 2</h3>
+        
+        <p>
+            Here we have decided to have a "sliding window" calculation so you have to sum three items together and then
+            calculate how many times it has increased, I have to admit I did think about this for a little while before I
+            came up with the solution that I could just store the indexes and then sum them.
+        </p>
+        
+        <p>
+            It doesn't specify what to do when the +2 range is larger than the array so I just made it so it takes the rest
+            of the numbers in the list and sum them
+        </p>
+        
+        <pre>
+            <code>
+                type SlidingWindow(value : int) =
+                    let Value = value
+                    
+                    member _.value ()= Value
+                        
+                    static member fromLines(start:int, endIndex : int, lines : List&lt;int&gt;) : SlidingWindow =
+                        let length = lines.Length - 1
+                        if length &gt;= endIndex then SlidingWindow(List.sum lines[start..endIndex])
+                        else SlidingWindow(List.sum lines[start..])
+                    
+                let windowIncreaseCalculator (contents: string)=
+                    let lines = contents.Split(Environment.NewLine) |&gt; Array.toList
+                    let intLines = List.map (fun x -&gt; x |&gt; Int32.Parse) lines
+                    let thing = lines |> List.mapi (fun i _ -&gt; SlidingWindow.fromLines(i, i+2, intLines))
+                        
+                    let mutable result = 0
+                    let mutable window = thing[0]
+                    
+                    for w in thing[1..] do
+                        let nextWindow = w;
+                        if nextWindow.value() &gt; window.value() then result &lt;- result + 1
+                        window &lt;- nextWindow
+                        
+                    result
+            </code>
+        </pre>
+        
+        <p>
+            Here is my solution for part 2. Again some refactoring and more use of functional concepts, I'm starting to like
+            the operators in f# but there are so many 😅 again the loop feels wrong but maybe I'll revisit this and come up with 
+            a better solution
+        </p>
+        
+        
+        <h3>... Revisited</h3>
+        
+        <p>
+            After some googling I found that my feelings were correct, that the loops with mutable values was a little incorrect
+            turns out there is a Seq class with some very useful functions, the one of interest here is pairwise, this takes the
+            current element and the previous element and puts it into a tuple which means we can chain the code a little nicer:
+        </p>
+        
+        <pre>
+            <code>
+                let increaseCalculator (contents: string)=
+                    let lines = contents.Split(Environment.NewLine)
+                                |> Seq.map (fun x -> x |> Int32.Parse)
+                                |> Seq.pairwise
+                                |> Seq.filter (fun (x,y) -> y > x)
+                                |> Seq.toArray
+                    lines.Length
+            </code>
+        </pre>
+        
+        <p>
+            This is much nicer because we're not doing anything too complicated and everything chains off one another, we take the lines
+            we convert each line into an int value, we pair each value with the next value we filter where the next value
+            is larger than the previous value and then create an array, then we  just inspect the length of the array and
+            we should get the correct value
+        </p>
     </FullContent>
 </Article>
 
