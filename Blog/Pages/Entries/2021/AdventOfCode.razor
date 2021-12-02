@@ -155,6 +155,246 @@
         <p>
             This was a nice warm up puzzle for the coming days I think
         </p>
+        
+        
+        <h1>Day 2: Dive!</h1>
+        
+        <p>
+            Today was an interesting one, we have some small interpreter work, not too intense as there are only three
+            operations, each have a operation and a parameter (which is a number), each operation does something different
+        </p>
+        
+        <p>
+            Interestingly when I was thinking about this one, I thought that it would be a good idea to have three different
+            operation classes with a base operation and then each one just added what they needed to add - this was very OO 
+            centric:
+        </p>
+        
+        <pre>
+            <code>
+                module AdventOfCodeFsharp._2021.Day2
+                
+                open System
+                
+                type Ship(horizontal:int, depth:int) =
+                    member _.horizontal ()= horizontal
+                    member _.depth ()= depth
+                    
+                type Instruction(amount:int) =
+                    abstract member execute : Ship -> Ship
+                    
+                    member _.amount ()= amount
+                    
+                    default _.execute(ship: Ship) : Ship =
+                        ship
+                        
+                type ForwardInstruction(amount:int) =
+                    inherit Instruction(amount)
+                    
+                    override _.execute(ship: Ship) : Ship =
+                        Ship(ship.horizontal() + amount, ship.depth())
+                        
+                type UpInstruction(amount:int) =
+                    inherit Instruction(amount)
+                    
+                    override _.execute(ship: Ship) : Ship =
+                        Ship(ship.horizontal(), ship.depth() - amount)
+                        
+                type DownInstruction(amount:int) =
+                    inherit Instruction(amount)
+                
+                    override _.execute(ship: Ship) : Ship =
+                        Ship(ship.horizontal(), ship.depth() + amount)
+                    
+                let getInstruction(input:string) : Instruction =
+                    let parts = input.Split(" ")
+                    let value = parts[1] |> Int32.Parse
+                    
+                    match parts[0] with
+                        | "forward" -> ForwardInstruction(value)   
+                        | "down" -> DownInstruction(value)   
+                        | "up" -> UpInstruction(value)
+                        | _ -> failwith "todo"
+                        
+                let getInstructions (input:string) : List&lt;Instruction> =
+                    input.Split(Environment.NewLine)
+                        |> Array.map (fun elem -> elem |> getInstruction)
+                        |> Array.toList
+                        
+                let executeInstructions (input :string) =
+                    let mutable ship = Ship(0,0)
+                    input
+                        |> getInstructions
+                        |> List.map (fun elem -> ship &lt;- ship |> elem.execute)
+                        |> ignore
+                        
+                    ship
+            </code>
+        </pre>
+    
+        <p>
+            Much like yesterday I thought of the mutable keyword as a code smell, but before revisiting that let's quickly talk 
+            about the second challenge, today it was really not much different so I'll just pase my solution
+        </p>
+    
+        <h2>Part 2</h2>
+        <pre>
+            <code>
+                module AdventOfCodeFsharp._2021.Day2_2
+                
+                open System
+                
+                type Ship(horizontal:int, depth:int, aim:int) =
+                    member _.horizontal ()= horizontal
+                    member _.depth ()= depth
+                    member _.aim ()= aim
+                    
+                type Instruction(amount:int) =
+                    abstract member execute : Ship -> Ship
+                    
+                    member _.amount ()= amount
+                    
+                    default _.execute(ship: Ship) : Ship =
+                        ship
+                        
+                type ForwardInstruction(amount:int) =
+                    inherit Instruction(amount)
+                    
+                    override _.execute(ship: Ship) : Ship =
+                        let newDepth = ship.depth() + (ship.aim() * amount)
+                        Ship(ship.horizontal() + amount, newDepth, ship.aim())
+                        
+                type UpInstruction(amount:int) =
+                    inherit Instruction(amount)
+                    
+                    override _.execute(ship: Ship) : Ship =
+                        Ship(ship.horizontal(), ship.depth(), ship.aim() - amount)
+                        
+                type DownInstruction(amount:int) =
+                    inherit Instruction(amount)
+                
+                    override _.execute(ship: Ship) : Ship =
+                        Ship(ship.horizontal(), ship.depth() , ship.aim()+ amount)
+                    
+                let getInstruction(input:string) : Instruction =
+                    let parts = input.Split(" ")
+                    let value = parts[1] |> Int32.Parse
+                    
+                    match parts[0] with
+                        | "forward" -> ForwardInstruction(value)   
+                        | "down" -> DownInstruction(value)   
+                        | "up" -> UpInstruction(value)
+                        | _ -> failwith "todo"
+                        
+                let getInstructions (input:string) : List&lt;Instruction> =
+                    input.Split(Environment.NewLine)
+                        |> Array.map (fun elem -> elem |> getInstruction)
+                        |> Array.toList
+                        
+                let executeInstructions (input :string) =
+                    let mutable ship = Ship(0,0,0)
+                    input
+                        |> getInstructions
+                        |> List.map (fun elem -> ship &lt;- ship |> elem.execute)
+                        |> ignore
+                    ship
+            </code>
+        </pre>
+    
+        <h2>....Revisited</h2>
+    <p>
+        So I started by thinking about what could change here, and my focus waas around the ship being mutable,
+        I started to thinking about how I could store the state while going through the list and then it hit me that this was
+        a reduce problem
+    </p>
+    
+    <p>
+        The first refactoring I did was to get rid of the instructions because they really weren't doing anything complicated
+        instead I changed getInstruction to return the Ship with the values to change 
+    </p>
+    
+    <pre>
+<code>
+let getInstruction(input:string) : Instruction =
+    let parts = input.Split(" ")
+    let value = parts[1] |> Int32.Parse
+    
+    match parts[0] with
+        | "forward" -> Ship(value,0) 
+        | "down" -> Ship(0,value) 
+        | "up" -> Ship(0,-value) 
+        | _ -> failwith "todo"
+</code>
+</pre>
+    
+    <p>
+        Now I can change the map to a reduce function
+        
+        <code>
+            Array.reduce (fun acc ship -> Ship(acc.horizontal() + ship.horizontal(), acc.depth() + ship.depth()) 
+        </code>
+    </p>
+    
+    
+    
+    <p>
+        This got rid of the mutable stuff, but then I realized that the ship was just a tuple:
+        
+    </p>
+    
+    <pre>
+        <code>
+        let getInstruction(input:string)  =
+            let parts = input.Split(" ")
+            let value = parts[1] |> Int32.Parse
+            
+            match parts[0] with
+                | "forward" -> (value, 0)   
+                | "down" -> (0, value)  
+                | "up" -> (0, -value)
+                | _ -> failwith "todo"
+        </code>
+    </pre>
+    <pre>
+    <code>
+        Array.reduce (fun (a,b) (c,d) -> (a+c, b+d)) 
+    </code>
+</pre>
+    
+    <p>
+        Now we are getting more functional, we don't need Array.toList because we can keep it as an array which means that getInstructions
+        is now redundant so here's my final solution
+    </p>
+    <pre>
+    <code>
+        let getInstruction(input:string)  =
+            let parts = input.Split(" ")
+            let value = parts[1] |> Int32.Parse
+            
+            match parts[0] with
+                | "forward" -> (value, 0)   
+                | "down" -> (0, value)  
+                | "up" -> (0, -value)
+                | _ -> failwith "todo"
+                
+        let executeInstructions (input :string) =
+           input.Split(Environment.NewLine)
+                |> Array.map (fun elem -> elem |> getInstruction)
+                |> Array.reduce (fun (a,b) (c,d) -> (a+c, b+d)) 
+    </code>
+</pre>
+    
+    <p>
+        After talking it through with some programmer friends I thought it interesting when someone brought up that the
+        difference here is that we are thinking of the data as a collection and that there are three very popular functions
+        that you can do to data which are map, reduce, filter. With these three functions we should be able to do most of 
+        visualizations. 
+    </p>
+    
+    <p>
+        Thinking of things as a collection and function inputs and outputs and how one feeds into another is very interesting
+        and I think this is how one tackles a functional problem
+    </p>
     </FullContent>
 </Article>
 
