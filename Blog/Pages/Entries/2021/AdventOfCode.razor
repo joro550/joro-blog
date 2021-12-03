@@ -395,6 +395,105 @@ let getInstruction(input:string) : Instruction =
         Thinking of things as a collection and function inputs and outputs and how one feeds into another is very interesting
         and I think this is how one tackles a functional problem
     </p>
+    
+    <h1>Day 3: Binary Diagnostic</h1>
+    
+    <p>
+        Todays first puzzle was quite fun, we have a number which i represented in binary, we have to find the "most popular"
+        value for each position and the least popular for each position and then multiply them together, today I was feeling good about this
+        because I thought about the input/output and thought about things in collections and think I came up with a nice
+        functional solution straight away
+    </p>
+    
+    <pre>
+        <code>
+        let stringToIntArray (input: string) =
+            input.ToCharArray()
+                |> Array.map (fun elem -> elem.ToString() |> Int32.Parse)
+                        
+        let getGammaValue (input:string)=
+            let length = input.Split(Environment.NewLine).Length /2
+            let value = input.Split(Environment.NewLine)
+                            |> Array.map (fun elem -> elem |> stringToIntArray)
+                            |> Array.reduce (fun acc elem -> elem |> Array.map2 (+) acc)
+                            |> Array.map (fun elem -> if elem > length then "1" else "0")
+                            |> String.concat ""
+                
+            Convert.ToInt32(value, 2)
+            
+            
+        let getEpsilonRate (input:string)=
+            let length = input.Split(Environment.NewLine).Length /2
+            let value = input.Split(Environment.NewLine)
+                            |> Array.map (fun elem -> elem |> stringToIntArray)
+                            |> Array.reduce (fun acc elem -> elem |> Array.map2 (+) acc)
+                            |> Array.map (fun elem -> if elem > length then "0" else "1")
+                            |> String.concat ""
+                
+            Convert.ToInt32(value, 2)
+        </code>
+    </pre>
+    <p>
+        I was quite sad to see that I couldn't "pipe into" the convert function there but beggers can't be choosers
+    </p>
+    
+    <h2>Part 2</h2>
+    
+    <p>
+        You know I thought after solving this in basically one shot in about 30 minutes I thought I'd finally got a grip
+        on this whole functional thing, I tried looking at this from every angle I could think of, maybe if i reduced a map
+        of the most popular numbers, maybe the other way round? maybe sideways?
+    </p>
+    
+    <p>
+        But no. I couldn't do it 😬
+    </p>
+    <pre>
+        <code>
+            let getMostPopularNumber (input:string[])=
+                let length = if input.Length % 2 > 0 then input.Length/2 + 1 else input.Length /2
+                input
+                    |> Array.map (fun elem -> elem |> stringToIntArray)
+                    |> Array.reduce (fun acc elem -> elem |> Array.map2 (+) acc)
+                    |> Array.map (fun elem -> if elem >= length then "1" else "0")
+                    
+            let getLeastPopularNumber (input:string[])=
+                let length = if input.Length % 2 > 0 then input.Length/2 + 1 else input.Length /2
+                let thing = input
+                                |> Array.map (fun elem -> elem |> stringToIntArray)
+                                |> Array.reduce (fun acc elem -> elem |> Array.map2 (+) acc)
+                Array.map (fun elem -> if elem >= length then "0" else "1") thing
+
+            let getOxygenRating (input:string)=
+                let mutable i =0
+                let mutable values = input.Split(Environment.NewLine)
+                    
+                while values.Length > 1 do
+                    let mostPopular = getMostPopularNumber(values)
+                    values &lt;- values |> Array.filter (fun elem -> elem[i].ToString() = mostPopular[i])
+                    i &lt;- i + 1
+
+                Convert.ToInt32(values[0],2)
+                
+            let getco2Rating (input:string)=
+                let mutable i =0
+                let mutable values = input.Split(Environment.NewLine)
+
+                while values.Length > 1 do
+                    let mostPopular = getLeastPopularNumber(values)
+                    values &lt;- values |> Array.filter (fun elem -> elem[i].ToString() = mostPopular[i])
+                    i &lt;- i + 1
+
+                Convert.ToInt32(values[0],2)
+        </code>
+    </pre>
+    
+    <p>
+        I have thought about this eveyr way but Sunday and I just can't find a way to make it none mutable, so today sadly 
+        no revisited, I have given up. It also didn't help that I misread the instructions for a good hour because 
+        I wasn't recalculating the most (and least) popular number. Today made me happy then sad, this is the life
+        of a programmer sometimes.
+    </p>
     </FullContent>
 </Article>
 
