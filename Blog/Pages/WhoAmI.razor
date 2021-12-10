@@ -1,0 +1,16 @@
+﻿@page "/whoami"
+
+<NewArticle Name="Mark Davies" Title="RE: Who am I?" Sample="Sample" Class="email-item-unread">
+    <SampleContent>
+        Sample
+    </SampleContent>
+    
+    <FullContent>
+        Full
+    </FullContent>
+</NewArticle>
+
+
+@code{
+    [Parameter] public bool Sample { get; set; }
+}
