@@ -22,7 +22,7 @@ else
             <div class="pure-u-1-2">
                 <h1 class="email-content-title">@Title</h1>
                 <p class="email-content-subtitle">
-                    From <a>@Name</a> at <span>3:56pm, April 3, 2012</span>
+                    From <a>@Name</a> at <span>@Date</span>
                 </p>
             </div>
 
@@ -44,6 +44,7 @@ else
     [Parameter] public string Title { get; set; }
     [Parameter] public bool Sample { get; set; }
     [Parameter] public string Name { get; set; }
+    [Parameter] public string Date { get; set; }
     
     [Parameter] public string? Class { get; set; }
     

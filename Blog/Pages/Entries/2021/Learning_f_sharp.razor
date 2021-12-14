@@ -1,12 +1,159 @@
 ﻿@page "/Learning_f_sharp"
 
-<NewArticle Name="Mark Davies" Title="Learning f#" Sample="Sample">
+<NewArticle Name="Mark Davies" Title="Learning f#" Sample="Sample" Date="December 2021">
     <SampleContent>
-        Sample
+        <p>
+            Funcational languages over the last 5-10 (probably even before then) years have been on a bit of a resugence,
+            did they even ever go away? Back in the 90's (I was born in '91) there was a big push towards OO because of memory 
+            constraints, but now that memory is (reletively) cheap functional is back - with a vengence. 
+        </p>
+        
     </SampleContent>
     
     <FullContent>
-        Full
+        <p>
+            I have to admit that I did not <b>get it</b> at first, what was so great about functional languages, why
+            was everyone I knew about talknig about them? I remember sitting up late some nights learning the basics of
+            a lisp based language (I can't remember which one) and I thought "huh this is cool" but I never really <b>got it</b>
+        </p>
+        
+        <p>
+            Over the years it been on my "to do" list as a developer - to understand the "hype" around functional languages
+            and even though I don't think I'm presonally on that paricular "hype train" after spending a half of my Decemeber using
+            f# I have to say I am closer now than I ever have been
+        </p>
+        
+        <p>
+            I'm not going to say that I love functional language but now that I've been using one for a better half of a month 
+            I feel like I'm in a good position to list some things that I personally like.
+        </p>
+        
+        <p>
+            <i>Small disclaimer</i>: I know some people will say that f# isn't a "true" functional programming language 
+            because it's based on c#, and has types and relies too heavily on that fact, I feel like it's fair to say it's
+            a functional language because it has all the hallmarks of a functional language with some OO thrown in for fun
+        </p>
+        
+        
+        <h2>Piping results</h2>
+        
+        <p>
+            When I first started "doing functional" code I felt it was easier to start off by completing things
+            in an OO way, taking an example from my Advent of Code solutions:
+        </p>
+        
+        
+        <pre>
+            <code>
+                type SlidingWindow(value : int) =
+                    let Value = value
+                    
+                    member _.value ()= Value
+                        
+                    static member fromLines(start:int, endIndex : int, lines : List&lt;int&gt;) : SlidingWindow =
+                        let length = lines.Length - 1
+                        if length &gt;= endIndex then SlidingWindow(List.sum lines[start..endIndex])
+                        else SlidingWindow(List.sum lines[start..])
+                    
+                let windowIncreaseCalculator (contents: string)=
+                    let lines = contents.Split(Environment.NewLine) |&gt; Array.toList
+                    let intLines = List.map (fun x -&gt; x |&gt; Int32.Parse) lines
+                    let thing = lines |> List.mapi (fun i _ -&gt; SlidingWindow.fromLines(i, i+2, intLines))
+                        
+                    let mutable result = 0
+                    let mutable window = thing[0]
+                    
+                    for w in thing[1..] do
+                        let nextWindow = w;
+                        if nextWindow.value() &gt; window.value() then result &lt;- result + 1
+                        window &lt;- nextWindow
+                        
+                    result
+            </code>
+        </pre>
+        
+        <p>
+            There is nothing <i>wrong</i> with this particular solution but you can see that a lot of my variables
+            are mutable, I was not yet thinking about replacing values, I was not thinking about functions and about how
+            one result can pipe into the next function, which is the power in functional languages
+        </p>
+        
+        <p>
+            Where as if you look at one of my later solutions (I swear I'll get around to completing that blog post, AoC has
+            been put on the back burner this year just because I've been busy with some life stuff) 
+        </p>
+        
+        <pre>
+            <code>
+            let stringToIntArray (input: string) =
+                input.ToCharArray()
+                    |> Array.map (fun elem -> elem.ToString() |> Int32.Parse)
+                            
+            let getGammaValue (input:string)=
+                let length = input.Split(Environment.NewLine).Length /2
+                let value = input.Split(Environment.NewLine)
+                                |> Array.map (fun elem -> elem |> stringToIntArray)
+                                |> Array.reduce (fun acc elem -> elem |> Array.map2 (+) acc)
+                                |> Array.map (fun elem -> if elem > length then "1" else "0")
+                                |> String.concat ""
+                    
+                Convert.ToInt32(value, 2)
+                
+                
+            let getEpsilonRate (input:string)=
+                let length = input.Split(Environment.NewLine).Length /2
+                let value = input.Split(Environment.NewLine)
+                                |> Array.map (fun elem -> elem |> stringToIntArray)
+                                |> Array.reduce (fun acc elem -> elem |> Array.map2 (+) acc)
+                                |> Array.map (fun elem -> if elem > length then "0" else "1")
+                                |> String.concat ""
+                    
+                Convert.ToInt32(value, 2)
+            </code>
+        </pre>
+        
+        <p>
+            Now you can see that I was thinking about the piping a little more the |> operator is your best friend and
+            piping one thing into another thing is so powerful.
+        </p>
+        
+        <p>
+            A lot of my early days were spent asking myself "how do I get the current value" but the answer was so obvious
+            <b>use functions</b>
+        </p>
+        
+        <pre>
+            <code>
+            let stringToIntArray (input: string) =
+                input.ToCharArray()
+                    |> fun e -> e |> string
+            </code>
+        </pre>
+        
+        <p>
+            This for example if perfectly valid
+        </p>
+        
+        <h2>Thinking in groups</h2>
+        
+        <h2>Tuples</h2>
+        
+        <h2>Now we're thinking with functions</h2>
+        
+        <h2>Short hand functions</h2>
+        
+        <h2>Replace don't mutate</h2>
+        
+        <h2>Arbitrary loops</h2>
+
+        
+        <h2>Some quick things I don't like about f#</h2>
+        
+        <ul>
+            <li>If one branch has return value - all branches have to have return value</li>
+            <li>No continue/break keyword for loops</li>
+            <li></li>
+        </ul>
     </FullContent>
 </NewArticle>
 
