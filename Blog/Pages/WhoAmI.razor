@@ -1,15 +1,36 @@
 ﻿@page "/whoami"
 
-<NewArticle Name="Mark Davies" Title="RE: Who am I?" Sample="Sample" Class="email-item-unread">
+<Article Name="Mark Davies" Title="RE: Who am I?" Sample="Sample" Class="email-item email-item-unread pure-g" Href="/whoami">
     <SampleContent>
-        Sample
+        <p>
+            Who exactly is joro550
+        </p>
     </SampleContent>
-    
     <FullContent>
-        Full
+        <p>
+            🔭 I’m currently working on a bunch of things
+        </p>
+        
+        <ul>
+            <li>Desktop bookmarker</li>
+            <li>Contributing to other OS a bit more</li>
+            <li>Tweeter - a devchallenge that is a clone of twitter, using it to explore some new tech stacks</li>
+            <li>🌱 I’m currently learning Uniy (kind of want to make a game) and how to play the guitar</li>
+            <li>💬 Ask me about C#, myself 😄</li>
+            <li>📫 How to reach me: twitter: joro550, email: markdavies550@gmail.com</li>
+            <li> 😄 Pronouns: He/Him/His</li>
+        </ul>
+        
+        <p>
+            Anime profile pictures are the future and you just have to accept that into your life 😄
+            
+            About me: Born in 1991 in Wales (UK) 🇬🇧 originally learned how to code in C++ but did have a few years where I was in love with ActionScript and did some pretty cool stuff there (all lost to time). Went to college got a BTEC National Diploma in computing and then moved to England for University and earned a BsC in computer science, have been coding professionally for around 6 years.<br/>
+            Main languages: C#, JavaScript/TypeScript, SQL, HTML<br/>
+            Want to learn: functional type language (maybe F#)<br/>
+            Hobbies: Love me some music, learning to play the guitar. Runner<br/>
+        </p>
     </FullContent>
-</NewArticle>
-
+</Article>
 
 @code{
     [Parameter] public bool Sample { get; set; }

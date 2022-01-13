@@ -1,5 +1,5 @@
-@using Blog.Pages.Entries
 @using Blog.Pages
+@using Blog.Pages.Entries
 @inherits LayoutComponentBase
 
 <div id="layout" class="content pure-g">
@@ -11,11 +11,7 @@
     </div>
 
     <div id="list" class="pure-u-1">
-        <NavLink href="/whoami">
-            <WhoAmI Sample="true" />
-        </NavLink>
-        
-        <NewList/>
+        <List/>
     </div>
 
     <div id="main" class="pure-u-1">
